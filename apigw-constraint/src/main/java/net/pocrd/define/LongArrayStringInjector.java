@@ -1,4 +1,4 @@
-package net.pocrd.entity;
+package net.pocrd.define;
 
 import net.pocrd.define.ServiceInjectable;
 

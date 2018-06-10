@@ -3,7 +3,10 @@ package net.pocrd.core;
 import com.alibaba.fastjson.JSON;
 import net.pocrd.annotation.*;
 import net.pocrd.define.*;
-import net.pocrd.entity.*;
+import net.pocrd.entity.ApiMethodInfo;
+import net.pocrd.entity.ApiParameterInfo;
+import net.pocrd.entity.ReturnCodeContainer;
+import net.pocrd.entity.Serializer;
 import net.pocrd.responseEntity.*;
 import net.pocrd.util.*;
 import net.pocrd.util.TypeCheckUtil.DescriptionAnnotationChecker;
@@ -31,11 +34,7 @@ public final class ApiManager {
 
     public ApiManager() {
     }
-
-    public void register(List<ApiMethodInfo> apis, Object serviceInstance) {
-        register("", apis, serviceInstance);
-    }
-
+    
     /**
      * jarfilename用来定位是哪个jar包出的问题
      */

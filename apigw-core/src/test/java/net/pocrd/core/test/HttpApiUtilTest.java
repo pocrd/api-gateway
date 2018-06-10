@@ -4,12 +4,12 @@ import com.alibaba.fastjson.JSON;
 import net.pocrd.annotation.*;
 import net.pocrd.core.ApiManager;
 import net.pocrd.core.test.HttpApiUtilTest.RC;
+import net.pocrd.define.AbstractReturnCode;
 import net.pocrd.define.SecurityType;
 import net.pocrd.entity.Serializer;
-import net.pocrd.define.AbstractReturnCode;
 import net.pocrd.responseEntity.ObjectArrayResp;
-import net.pocrd.util.POJOSerializerProvider;
 import net.pocrd.responseEntity.RawString;
+import net.pocrd.util.POJOSerializerProvider;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -388,7 +388,7 @@ public class HttpApiUtilTest {
     public void test() throws UnsupportedEncodingException {
         try {
             ApiManager manager = new ApiManager();
-            manager.register(ApiManager.parseApi(HttpApiUtilTest.class), new HttpApiUtilTest());
+            manager.register("http api util test", ApiManager.parseApi(HttpApiUtilTest.class), new HttpApiUtilTest());
             {
                 RawString result = (RawString)manager.processRequest("test.test1", new String[] { "123", "456" });
                 System.out.println(result.value);
@@ -635,7 +635,7 @@ public class HttpApiUtilTest {
     @Test
     public void testDate() {
         ApiManager manager = new ApiManager();
-        manager.register(ApiManager.parseApi(HttpApiUtilTest.class), new HttpApiUtilTest());
+        manager.register("http api util test", ApiManager.parseApi(HttpApiUtilTest.class), new HttpApiUtilTest());
         {
             String[] darray = new String[3];
             darray[0] = "1234567891000";

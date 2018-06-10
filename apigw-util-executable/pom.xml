@@ -3,7 +3,7 @@
     <parent>
         <groupId>net.pocrd</groupId>
         <artifactId>apigw-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>apigw-util-executable</artifactId>
@@ -14,6 +14,7 @@
         <dependency>
             <groupId>net.pocrd</groupId>
             <artifactId>apigw-core</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>

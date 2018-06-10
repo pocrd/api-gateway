@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.pocrd</groupId>
     <artifactId>apigw-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>http://maven.apache.org</url>
     <name>${project.artifactId}</name>
@@ -16,23 +16,11 @@
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <apigw-constraint.version>1.0.0-SNAPSHOT</apigw-constraint.version>
-        <apigw-core.version>1.0.0-SNAPSHOT</apigw-core.version>
         <slf4j.version>1.7.7</slf4j.version>
         <logback.version>1.1.1</logback.version>
     </properties>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>net.pocrd</groupId>
-                <artifactId>apigw-constraint</artifactId>
-                <version>${apigw-constraint.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.pocrd</groupId>
-                <artifactId>apigw-core</artifactId>
-                <version>${apigw-core.version}</version>
-            </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>

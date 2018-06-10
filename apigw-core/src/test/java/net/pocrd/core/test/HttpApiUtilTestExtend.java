@@ -143,7 +143,7 @@ public class HttpApiUtilTestExtend {
     @Test
     public void test1Test() {
         ApiManager manager = new ApiManager();
-        manager.register(ApiManager.parseApi(HttpApiUtilTestExtend.class), new HttpApiUtilTestExtend());
+        manager.register("http api util test", ApiManager.parseApi(HttpApiUtilTestExtend.class), new HttpApiUtilTestExtend());
         manager.processRequest("test.test1", new String[13]);
     }
 
@@ -160,21 +160,21 @@ public class HttpApiUtilTestExtend {
     @Test
     public void test3Test() {
         ApiManager manager = new ApiManager();
-        manager.register(ApiManager.parseApi(HttpApiUtilTestExtend.class), new HttpApiUtilTestExtend());
+        manager.register("http api util test", ApiManager.parseApi(HttpApiUtilTestExtend.class), new HttpApiUtilTestExtend());
         manager.processRequest("test.test3", new String[] { "{\"entityList\":[{\"str\":\"abc\"}]}" });
     }
 
     @Test
     public void test4Test() {
         ApiManager manager = new ApiManager();
-        manager.register(ApiManager.parseApi(HttpApiUtilTestExtend.class), new HttpApiUtilTestExtend());
+        manager.register("http api util test", ApiManager.parseApi(HttpApiUtilTestExtend.class), new HttpApiUtilTestExtend());
         manager.processRequest("test.test4", new String[] { "[{\"entityList\":[{\"str\":\"abc\"}]}]", "[{\"entityList\":[{\"str\":\"abc\"}]}]" });
     }
 
     @Test
     public void test5Test() {
         ApiManager manager = new ApiManager();
-        manager.register(ApiManager.parseApi(HttpApiUtilTestExtend.class), new HttpApiUtilTestExtend());
+        manager.register("http api util test", ApiManager.parseApi(HttpApiUtilTestExtend.class), new HttpApiUtilTestExtend());
         manager.processRequest("test.test5", new String[] { "[\"A\"]" });
     }
 }
