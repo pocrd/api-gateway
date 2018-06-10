@@ -1,7 +1,7 @@
 package net.pocrd.apigw.common;
 
+import net.pocrd.define.CompileConfig;
 import net.pocrd.entity.CommonConfig;
-import net.pocrd.entity.CompileConfig;
 import net.pocrd.util.AESTokenHelper;
 import net.pocrd.util.AesHelper;
 import net.pocrd.util.Base64Util;
