@@ -1,0 +1,4 @@
+notificationConsumer=net.pocrd.dubboext.NotificationConsumerFilter
+traceInfoConsumer=net.pocrd.dubboext.TraceInfoConsumerFilter
+traceInfoProvider=net.pocrd.dubboext.TraceInfoProviderFilter
+exceptionHandleProvider=net.pocrd.dubboxext.ExceptionHandleProviderFilter
