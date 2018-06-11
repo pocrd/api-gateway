@@ -78,7 +78,7 @@ public class ApiSdkCSharpGenerator extends ApiCodeGenerator {
             while ((line = reader.readLine()) != null) {
                 out.append(line.replace("${pkg}", packagePrefix) + "\r");
             }
-            System.out.println(out.toString());   //Prints the string content read from input stream
+            //System.out.println(out.toString());   //Prints the string content read from input stream
             swapStream = new ByteArrayInputStream(out.toString().getBytes(ConstField.UTF8));
         } catch (Exception e) {
             logger.error("transform file failed!", e);

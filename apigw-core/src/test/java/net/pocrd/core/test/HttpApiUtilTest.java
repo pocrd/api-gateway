@@ -1,6 +1,7 @@
 package net.pocrd.core.test;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import net.pocrd.annotation.*;
 import net.pocrd.core.ApiManager;
 import net.pocrd.core.test.HttpApiUtilTest.RC;
@@ -388,6 +389,12 @@ public class HttpApiUtilTest {
     public void test() throws UnsupportedEncodingException {
         try {
             ApiManager manager = new ApiManager();
+
+            JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.DisableCircularReferenceDetect.getMask();//disable循环引用
+            JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.NotWriteRootClassName.getMask();
+            JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.WriteNullNumberAsZero.getMask();
+            JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.WriteNullBooleanAsFalse.getMask();
+
             manager.register("http api util test", ApiManager.parseApi(HttpApiUtilTest.class), new HttpApiUtilTest());
             {
                 RawString result = (RawString)manager.processRequest("test.test1", new String[] { "123", "456" });
@@ -525,12 +532,12 @@ public class HttpApiUtilTest {
                 assertEquals("{\"value\":[1,2,3]}", re);
             }
             {
-                Object result = manager.processRequest("test.test15", new String[] { "1" });
+                Object result = manager.processRequest("test.test15", new String[] { "2.5" });
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
                 POJOSerializerProvider.getSerializer(result.getClass()).toJson(result, baos, true);
                 String re = baos.toString();
                 System.out.println(re);
-                assertEquals("{\"value\":1.0}", re);
+                assertEquals("{\"value\":2.5}", re);
             }
             {
                 Object result = manager.processRequest("test.test16", new String[] { "1", "2", "3" });
@@ -546,7 +553,7 @@ public class HttpApiUtilTest {
                 POJOSerializerProvider.getSerializer(result.getClass()).toJson(result, baos, true);
                 String re = baos.toString();
                 System.out.println(re);
-                assertEquals("{\"value\":1.0}", re);
+                assertEquals("{\"value\":1}", re);
             }
             {
                 Object result = manager.processRequest("test.test18", new String[] { "1", "2", "3" });

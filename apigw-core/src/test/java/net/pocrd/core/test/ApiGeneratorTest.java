@@ -8,9 +8,9 @@ import net.pocrd.core.generator.ApiSdkJavaGenerator;
 import net.pocrd.core.generator.ApiSdkJavaScriptGenerator;
 import net.pocrd.core.generator.ApiSdkObjectiveCGenerator;
 import net.pocrd.core.generator.HtmlApiDocGenerator;
+import net.pocrd.define.AbstractReturnCode;
 import net.pocrd.define.ApiOpenState;
 import net.pocrd.define.SecurityType;
-import net.pocrd.define.AbstractReturnCode;
 import net.pocrd.entity.ApiMethodInfo;
 import net.pocrd.entity.CommonConfig;
 import net.pocrd.responseEntity.RawString;
@@ -62,7 +62,7 @@ public class ApiGeneratorTest {
     @Test
     public void testJavaGenertorViaJar() throws ParserConfigurationException, IOException, SAXException {
         new ApiSdkJavaGenerator.Builder().setOutputPath(CommonConfig.getInstance().getAutogenPath() + "/javaFromJar").build()
-                .generateViaJar("/Users/rendong/workspace/github/net.pocrd.api/apigw-test/apigwtest-api/target/apigwtest-api.jar");
+                .generateViaJar("/tmp/api/apigwtest-api.jar");
     }
 
     @Test

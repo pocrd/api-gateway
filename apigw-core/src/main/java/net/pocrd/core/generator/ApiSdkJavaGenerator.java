@@ -3,8 +3,8 @@ package net.pocrd.core.generator;
 import net.pocrd.annotation.ConsoleArgument;
 import net.pocrd.annotation.ConsoleJoinPoint;
 import net.pocrd.annotation.ConsoleOption;
-import net.pocrd.define.ConstField;
 import net.pocrd.define.CompileConfig;
+import net.pocrd.define.ConstField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -85,7 +85,7 @@ public class ApiSdkJavaGenerator extends ApiCodeGenerator {
                 out.append(line.replace("${pkg}", packagePrefix) + "\r\n");
             }
             if (CompileConfig.isDebug) {
-                System.out.println(out.toString());   //Prints the string content read from input stream
+                //System.out.println(out.toString());   //Prints the string content read from input stream
             }
             swapStream = new ByteArrayInputStream(out.toString().getBytes(ConstField.UTF8));
         } catch (Exception e) {
