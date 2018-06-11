@@ -196,7 +196,7 @@ public class ApiReturnCode extends AbstractReturnCode {
     public final static AbstractReturnCode ROLE_DENIED    = new ApiReturnCode("当前用户权限不足", _C_ROLE_DENIED);
 
     public final static int                _C_SUBSYSTEM_AUTHENTICATION_FAILED = -410;
-    public final static AbstractReturnCode SUBSYSTEM_AUTHENTICATION_FAILED    = new ApiReturnCode("", _C_SUBSYSTEM_AUTHENTICATION_FAILED);
+    public final static AbstractReturnCode SUBSYSTEM_AUTHENTICATION_FAILED    = new ApiReturnCode("子系统授权失败", _C_SUBSYSTEM_AUTHENTICATION_FAILED);
 
     protected ApiReturnCode(String desc, int code) {
         super(desc, code);

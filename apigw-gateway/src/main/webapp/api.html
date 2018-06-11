@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <title>API文档</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <style>
+    body {
+        padding: 0;
+        margin: 0;
+    }
+    
+    .api-group {
+        width: 200px;
+        height: 100vh;
+        position: fixed;
+        overflow: auto;
+        border-right: 1px solid #000;
+    }
+    
+    .api-group li {
+        cursor: pointer;
+    }
+    
+    .main {
+        padding-left: 220px;
+    }
+    
+    .security-level,
+    .system-parameter-info-list,
+    .resp-struct-list,
+    .code-list {
+        font-weight: bold;
+    }
+    
+    .des {
+        float: right;
+    }
+    
+    .api-title:hover {
+        background-color: #D4E2F1;
+        cursor: pointer;
+    }
+    
+    .api-detail {
+        padding-left: 15px;
+    }
+    
+    .api-name {
+        float: left;
+    }
+    
+    .api-des {
+        padding-left: 500px;
+    }
+    
+    .paramter {
+        padding: 15px;
+        border: 1px solid #000;
+    }
+    
+    .show-detail {
+        background: #f8fcff;
+    }
+    
+    .api-group {
+        width: 210px;
+    }
+    
+    .main {
+        padding-left: 230px;
+        padding-right: 10px;
+    }
+    
+    .main {
+        color: #999;
+        transition: all 200ms linear;
+    }
+    
+    .main .show-detail,
+    .main .security-level,
+    .main .system-parameter-info-list,
+    .main .table {
+        color: #000;
+    }
+    
+    .api-item {
+        background-color: rgba(253, 255, 239, 0.01);
+    }
+    
+    .show-detail {
+        border-radius: 5px;
+        padding-bottom: 10px;
+        transition: all 200ms linear;
+        background-color: rgba(253, 255, 239, 0.74);
+    }
+    
+    .choose {
+        font-weight: bold;
+        border-radius: 5px;
+        padding: 5px;
+        background-color: rgb(249, 255, 203);
+        animation: choose 200ms 0s linear 1;
+    }
+    
+    .show-detail .api-title {
+        padding: 5px 5px 5px 10px;
+        margin-bottom: 10px;
+        border-radius: 0 0 5px 5px;
+        border-bottom: 1px solid #efecec;
+        background-color: rgb(238, 245, 251);
+        box-sizing: border-box;
+    }
+    
+    @keyframes choose {
+        0% {
+            background-color: rgba(221, 240, 255, 0.1);
+        }
+        100% {
+            background-color: rgba(221, 240, 255, 0.76);
+        }
+    }
+    
+    .show-detail .api-detail .paramter {
+        margin-right: 10px;
+        margin-top: 10px;
+    }
+    
+    table {
+        border-spacing: 0;
+        border-collapse: collapse
+    }
+    
+    td,
+    th {
+        padding: 0
+    }
+    
+    .table {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+        border: 1px solid #ededed;
+    }
+    
+    .table th {
+        text-align: left;
+        color: #333;
+    }
+    
+    .table>tbody>tr>td,
+    .table>tbody>tr>th,
+    .table>tfoot>tr>td,
+    .table>tfoot>tr>th,
+    .table>thead>tr>td,
+    .table>thead>tr>th {
+        padding: 8px;
+        line-height: 1.42857143;
+        border-top: 1px solid #ededed;
+    }
+    
+    .table>thead>tr>th {
+        vertical-align: bottom;
+        border-bottom: 1px solid #ededed;
+    }
+    
+    .table>caption+thead>tr:first-child>td,
+    .table>caption+thead>tr:first-child>th,
+    .table>colgroup+thead>tr:first-child>td,
+    .table>colgroup+thead>tr:first-child>th,
+    .table>thead:first-child>tr:first-child>td,
+    .table>thead:first-child>tr:first-child>th {
+        border-top: 0
+    }
+    
+    .table>tbody+tbody {
+        border-top: 2px solid #ededed;
+    }
+    
+    .table .table {
+        background-color: #fff
+    }
+    
+    .table-condensed>tbody>tr>td,
+    .table-condensed>tbody>tr>th,
+    .table-condensed>tfoot>tr>td,
+    .table-condensed>tfoot>tr>th,
+    .table-condensed>thead>tr>td,
+    .table-condensed>thead>tr>th {
+        padding: 5px
+    }
+    
+    .table-bordered {
+        border: 1px solid #ededed;
+    }
+    
+    .table-bordered>tbody>tr>td,
+    .table-bordered>tbody>tr>th,
+    .table-bordered>tfoot>tr>td,
+    .table-bordered>tfoot>tr>th,
+    .table-bordered>thead>tr>td,
+    .table-bordered>thead>tr>th {
+        border: 1px solid #ededed;
+    }
+    
+    .table-hover>tbody>tr:hover {
+        background-color: #f5f5f5
+    }
+    
+    .table-striped>tbody>tr:nth-of-type(odd) {
+        background-color: #fbfbfb;
+    }
+    
+    .copy:before {
+        display: inline-block;
+        content: '复制成功';
+        font-size: 12px;
+        position: absolute;
+        opacity: 0;
+        margin-top: 20px;
+        transition: all .5s ease;
+    }
+    
+    .copyed:before {
+        opacity: 1;
+    }
+    </style>
+    <style id="search_style"></style>
+</head>
+
+<body>
+    <div class="container" id="container" v-cloak>
+        <div class="api-group">
+            <div style="text-align: center;">
+                <input style="margin-top:15px;height: 20px" type="text" v-model="apiName" @keyup="autoChoose">
+            </div>
+            <ul>
+                <li v-for="item in groupKeyComputedList" class="searchable" @click="choose(item)" :class="{choose:currentGroup==item}">{{item}}</li>
+            </ul>
+        </div>
+        <div class="main">
+            <div v-show="groupList.length">
+                <div v-for="api in renderList" style="margin-top:10px;">
+                    <div class="security-level" v-show="api.list.length">{{api.securityLevel}}</div>
+                    <div v-for="item in api.list" class="api-item" :class="{'show-detail':item.showDetail}" :data-str="item.methodName.split('.')[1].toLowerCase()">
+                        <div class="api-title" @click="item.showDetail=!item.showDetail">
+                            <div class="api-name" v-html="ht(item.methodName)"></div>
+                            <div class="api-des">{{item.description}}</div>
+                        </div>
+                        <div class="api-detail" v-show="item.showDetail">
+                            <div><strong>安全级别</strong> : {{item.securityLevel}} </div>
+                            <div><strong>接口分组</strong> : {{item.groupName}} </div>
+                            <div><strong>接口状态</strong> : {{item.state}}</div>
+                            <div><strong>接口负责</strong> : {{item.methodOwner}} </div>
+                            <div><strong>项目负责</strong> : {{item.groupOwner}}</div>
+                            <div class="paramter" v-show="item.parameterInfoList && item.parameterInfoList.length"><strong>应用级参数列表:</strong>
+                                <button class="copy" @click="getMock(item.methodName,'req')">获取mock数据</button>
+                                <button class="copy" @click="copy(item.methodName)">复制接口名称</button>
+                                <table class="table table-bordered" style="margin-top:15px;">
+                                    <tbody>
+                                        <tr>
+                                            <th>必要性</th>
+                                            <th>参数名</th>
+                                            <th>类型</th>
+                                            <th>描述</th>
+                                        </tr>
+                                        <tr v-for="iitem in item.parameterInfoList">
+                                            <td>{{iitem.isRequired}}</td>
+                                            <td>{{iitem.name}}</td>
+                                            <td><span v-show="iitem.isList">List<</span>{{iitem.type}}<span v-show="iitem.isList">></span></td>
+                                            <td>{{iitem.description}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div v-for="iitem in item.reqStructList">
+                                    <font color="blue">{{iitem.name}}</font>
+                                    <table class="table table-bordered" style="margin-top:15px;">
+                                        <tbody>
+                                            <tr v-for="iiitem in iitem.fieldList">
+                                                <td><span v-show="iiitem.isList">List<</span>{{iiitem.type}}<span v-show="iiitem.isList">></span></td>
+                                                <td>{{iiitem.name}}</td>
+                                                <td>{{iiitem.desc}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="paramter"><strong>返回值类型：</strong>
+                                <button @click="getMock(item.methodName,'resp')">获取mock数据</button>
+                                <div v-for="item in item.respStructList">
+                                    <font color="blue">{{item.name}}:</font>
+                                    <table class="table table-bordered" style="margin-top:15px;">
+                                        <tbody>
+                                            <tr v-for="iitem in item.fieldList">
+                                                <td><span v-show="iitem.isList">List<</span>{{iitem.type}}<span v-show="iitem.isList">></span></td>
+                                                <td>{{iitem.name}}</td>
+                                                <td>{{iitem.desc}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="paramter" v-show="item.errorCodeList&&item.errorCodeList.length">
+                                <strong>业务异常列表：</strong>
+                                <table class="table table-bordered" style="margin-top:15px;">
+                                    <tbody>
+                                        <tr>
+                                            <th>code</th>
+                                            <th>name</th>
+                                            <th>描述</th>
+                                        </tr>
+                                        <tr v-for="iitem in item.errorCodeList">
+                                            <td>{{iitem.code}}</td>
+                                            <td>{{iitem.name}}</td>
+                                            <td>{{iitem.desc}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-show="systemParameterInfoList.length">
+                <div class="system-parameter-info-list" style="margin-top:100px;">系统级参数列表:</div>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>参数名</th>
+                            <th>描述</th>
+                        </tr>
+                        <tr v-for="item in systemParameterInfoList">
+                            <td>{{item.name}}</td>
+                            <td>{{item.desc}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div v-show="respStructList.length">
+                <div class="resp-struct-list">通用返回值结构</div>
+                <div v-for="item in respStructList">
+                    <div>{{item.name}}</div>
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr v-for="item in item.fieldList">
+                                <td>{{item.type}}</td>
+                                <td>{{item.name}}</td>
+                                <td>{{item.desc}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div v-show="codeList.length">
+                <div class="code-list">通用异常列表</div>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>错误码</th>
+                            <th>名称</th>
+                            <th>描述</th>
+                        </tr>
+                        <tr v-for="item in codeList">
+                            <td>{{item.code}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.desc}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div v-show="businessCodeList.length">
+                <div class="code-list">业务异常列表</div>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>服务</th>
+                            <th>需要客户端处理</th>
+                            <th>错误码</th>
+                            <th>名称</th>
+                            <th>描述</th>
+                        </tr>
+                        <tr v-for="item in businessCodeList">
+                            <td>{{item.service}}</td>
+                            <td v-html="item.isDesign?'是':'否'"></td>
+                            <td>{{item.code}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.desc}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+    vm = new Vue({
+        el: '#container',
+        data: {
+            locationHash: location.hash.substr(1),
+            currentGroup: '',
+            MOCKMAP: {},
+            METHODMAP: {},
+            groupMap: {},
+            groupKeyList: [],
+            anonymList: [],
+            renderList: [],
+            apiName: '',
+            systemParameterInfoList: [], //系统级参数列表
+            respStructList: [], //通用返回值
+            codeList: [], //通用异常列表  code < 0
+            businessCodeList: [], //业务异常列表  code > 0
+        },
+        computed: {
+            groupList: function() {
+                return this.groupMap[this.currentGroup] || [];
+            },
+            groupKeyComputedList: function() {
+                if (this.apiName == '') {
+                    document.getElementById('search_style').innerHTML = '';
+                    return this.groupKeyList;
+                }
+                return this.searchApi(this.apiName);
+            }
+        },
+        methods: {
+            searchApi: function(methodName) {
+                var apiArr = methodName.split('.');
+                var searchStyle = document.getElementById('search_style');
+                searchStyle.innerHTML = '';
+                var groupName = apiArr[0];
+                var computedList = this.groupKeyList.filter(groupKey => {
+                    var garr = groupName.split('');
+                    var k, i = 0;
+                    var f = true;
+                    while (k = garr.shift()) {
+                        groupKey = groupKey.substr(i);
+                        i = groupKey.toLowerCase().indexOf(k.toLowerCase());
+                        if (i == -1) {
+                            f = false;
+                        }
+                        i++;
+                    }
+                    return f;
+                });
+
+                if (apiArr.length == 2) {
+                    //显示隐藏右侧内容
+                    var mn = apiArr[1];
+
+                    var s = "";
+                    s += ".api-item:not([data-str*=\"" + mn.toLowerCase() + "\"]) { display: none; }";
+                    // s += mn.split('').map(e=>{
+                    //  return `.highlight[data-str*="h${e.toLowerCase()}"]{background: yellow;color: red;}`;
+                    // }).join('');
+                    searchStyle.innerHTML = s
+                    if (mn == '') {
+                        searchStyle.innerHTML = '';
+                    }
+                }
+
+                return computedList.sort((a, b) => {
+                    // return a.indexOf(groupName)!=-1;
+                    var ai = a.indexOf(groupName);
+                    ai = ai == -1 ? 9999 : ai;
+                    var bi = b.indexOf(groupName);
+                    bi = bi == -1 ? 9999 : bi;
+                    return ai - bi;
+                });
+            },
+            apiList: function(securityLevel) {
+                var s = this.groupList.filter(e => {
+                    return e.securityLevel.toLowerCase() == securityLevel.toLowerCase()
+                });
+                return s;
+            },
+            choose: function(item) {
+                this.currentGroup = item;
+                this.renderList = [{
+                    securityLevel: 'None',
+                    list: this.apiList('None')
+                }, {
+                    securityLevel: 'RegisteredDevice',
+                    list: this.apiList('RegisteredDevice')
+                }, {
+                    securityLevel: 'UserLogin',
+                    list: this.apiList('UserLogin')
+                }, {
+                    securityLevel: 'InternalUser',
+                    list: this.apiList('InternalUser')
+                }, {
+                    securityLevel: 'Integrated',
+                    list: this.apiList('Integrated')
+                }, {
+                    securityLevel: 'SubSystemUser',
+                    list: this.apiList('SubSystemUser')
+                }];
+            },
+            autoChoose: function() {
+                Vue.nextTick(() => {
+                    this.groupKeyComputedList.length && this.choose(this.groupKeyComputedList[0]);
+                });
+            },
+            getMock: function(methodName, type) {
+                var m = this.MOCKMAP[methodName][type];
+                this.copy(JSON.stringify(m, 2, 2))
+            },
+            /*复制文本
+             */
+            copy: function(str) {
+                //https://github.com/zenorocha/clipboard.js/blob/master/src/clipboard-action.js#L55-L75
+                var fakeElem = document.createElement("textarea");
+                // Prevent zooming on iOS
+                fakeElem.style.fontSize = '12pt';
+                // Reset box model
+                fakeElem.style.border = '0';
+                fakeElem.style.padding = '0';
+                fakeElem.style.margin = '0';
+                // Move element out of screen horizontally
+                fakeElem.style.position = 'absolute';
+                fakeElem.style.left = '-9999px';
+                // Move element to the same position vertically
+                var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+                fakeElem.style.top = yPosition + 'px';
+                fakeElem.value = str;
+                document.body.appendChild(fakeElem);
+                // 复制内容
+                fakeElem.select();
+                // fakeElem.setSelectionRange(0, fakeElem.value.length);
+                document.execCommand("copy");
+                document.body.removeChild(fakeElem);
+            },
+            showApiDetail: function(methodName) {
+                var _this = this;
+                this.apiName = methodName;
+                this.searchApi(methodName);
+                this.autoChoose();
+
+                Vue.nextTick(function() {
+                    _this.renderList.forEach(e => {
+                        e.list.forEach(e1 => {
+                            (e1.methodName == methodName) && (e1.showDetail = true);
+                        });
+                    });
+                });
+            },
+            ht: function(methodName) {
+                return methodName.split('').map(e => {
+                    return `<span class="highlight" data-str="h${e.toLowerCase()}">${e}</span>`
+                }).join('');
+            }
+        },
+        mounted: function() {
+
+            var mockMap = {
+                int: 0,
+                long: 0,
+                'List<int>': [0, 1, 2],
+                string: '',
+                'List<string>': ['', '', ''],
+                date: '2016-06-06 06:06:06',
+                float: 6.66,
+                double: 7.77,
+                boolean: false,
+                short: 32767
+            }
+
+            var url = `/info.api?json`;
+
+            var fCount = 0;
+            fetch(url).then((res) => {
+                return res.json();
+            }).then(res => {
+                apiList = res.apiList;
+                this.systemParameterInfoList = res.systemParameterInfoList; //系统级参数列表
+                this.respStructList = res.respStructList; //通用返回值结构
+
+                setTimeout(() => {
+                    //1s 后再来
+                    for (var i = 0, codeItem; codeItem = res.codeList[i]; i++) {
+                        //异常列表
+                        codeItem.code < 0 ? this.codeList.push(codeItem) : this.businessCodeList.push(codeItem);
+                    }
+                }, 1000);
+                for (var i = 0, len = apiList.length; i < len; i++) {
+                    var item = apiList[i];
+                    item.showDetail = false;
+                    fCount = 0; //为了防止递归
+                    Object.assign(this.MOCKMAP, format(item)); //获取mock数据
+                    this.METHODMAP[item.methodName] = item; //显示方法详情
+                    this.groupMap[item.groupName] = (this.groupMap[item.groupName] || []).concat(item);
+                }
+                this.groupKeyList = Object.keys(this.groupMap); //左侧api组
+
+                this.showApiDetail(this.locationHash);
+            });
+
+            function format(api) {
+                // console.log(api);
+
+                var reqStructMap = {}; //请求值
+                if (api.reqStructList) {
+                    for (var i = 0, item; item = api.reqStructList[i]; i++) {
+                        reqStructMap[item.name] = item.fieldList;
+                    }
+                }
+
+                var respStructMap = {}; //返回值
+
+                for (var i = 0, item; item = api.respStructList[i]; i++) {
+                    respStructMap[item.name] = item.fieldList;
+                }
+
+                //参数
+                var _p = {}
+                api.parameterInfoList && api.parameterInfoList.forEach(p => {
+                    _p[p.name] = mockMap[p.type] === undefined ? f(p.type, reqStructMap) : mockMap[p.type];
+                });
+
+                function f(a, structMap) {
+                    fCount++;
+                    if (fCount > 10) {
+                        return undefined;
+                    }
+                    var s = structMap[a],
+                        ss = {};
+                    s.forEach(b => {
+                        var t = b.type,
+                            isApiType = structMap[t];
+                        ss[b.name] = isApiType ? [f(t, structMap)] : [mockMap[t]];
+                        !b.isList && (ss[b.name] = ss[b.name].pop());
+                    });
+                    return ss;
+                }
+
+                var r = {};
+                r[api.methodName] = {
+                    req: _p, //请求mock
+                    resp: mockMap[api.returnType] === undefined ? f(api.returnType, respStructMap) : mockMap[api.returnType]
+                };
+
+                return r;
+
+            }
+
+
+        }
+    });
+
+    //点击复制提示
+    document.body.onclick = function(e) {
+        if (e.target.classList.contains('copy')) {
+            e.target.classList.add('copyed');
+            setTimeout(function() {
+                e.target.classList.remove('copyed');
+            }, 600);
+        }
+    }
+    </script>
+</body>
+
+</html>
