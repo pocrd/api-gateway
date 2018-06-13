@@ -2,10 +2,10 @@ package net.pocrd.util;
 
 import net.pocrd.annotation.Description;
 import net.pocrd.core.PocClassLoader;
+import net.pocrd.define.CompileConfig;
 import net.pocrd.define.ConstField;
 import net.pocrd.define.Evaluator;
 import net.pocrd.entity.CommonConfig;
-import net.pocrd.define.CompileConfig;
 import org.objectweb.asm.*;
 
 import java.io.File;
@@ -57,7 +57,6 @@ public class EvaluatorProvider implements Opcodes {
                 .replace("/", "") + "_" + r_name.substring(r_name.lastIndexOf('/') + 1).replace("/", "");
         className = className.replace('$', '_');
         String c_name = className.replace('.', '/');
-        String c_desc = "L" + c_name + ";";
         String e_name = Type.getInternalName(Evaluator.class);
         String l_desc = Type.getDescriptor(leftClass);
         String r_desc = Type.getDescriptor(rightClass);
@@ -72,14 +71,9 @@ public class EvaluatorProvider implements Opcodes {
             {
                 MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
                 mv.visitCode();
-                Label l0 = new Label();
-                mv.visitLabel(l0);
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
                 mv.visitInsn(RETURN);
-                Label l1 = new Label();
-                mv.visitLabel(l1);
-                mv.visitLocalVariable("this", c_desc, null, l0, l1, 0);
                 mv.visitMaxs(1, 1);
                 mv.visitEnd();
             }

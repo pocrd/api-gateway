@@ -1,10 +1,10 @@
 package net.pocrd.util;
 
 import net.pocrd.core.PocClassLoader;
+import net.pocrd.define.CompileConfig;
 import net.pocrd.define.ConstField;
 import net.pocrd.define.ResultSetMapper;
 import net.pocrd.entity.CommonConfig;
-import net.pocrd.define.CompileConfig;
 import org.objectweb.asm.*;
 
 import java.io.File;
@@ -140,7 +140,7 @@ public class ORMProvider implements Opcodes {
                                 }
                                 fos = new FileOutputStream(
                                         CommonConfig.getInstance().getAutogenPath() + File.separator + "ORM" + File.separator
-                                                + className.substring(18) + ".class");
+                                                + className.replace("/", ".") + ".class");
                                 fos.write(cw.toByteArray());
                             } finally {
                                 if (fos != null) {

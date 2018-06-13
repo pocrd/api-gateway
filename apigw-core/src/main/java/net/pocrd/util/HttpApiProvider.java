@@ -3,11 +3,11 @@ package net.pocrd.util;
 import net.pocrd.annotation.Description;
 import net.pocrd.core.PocClassLoader;
 import net.pocrd.define.AutowireableParameter;
+import net.pocrd.define.CompileConfig;
 import net.pocrd.define.HttpApiExecutor;
 import net.pocrd.entity.ApiMethodInfo;
 import net.pocrd.entity.ApiParameterInfo;
 import net.pocrd.entity.CommonConfig;
-import net.pocrd.define.CompileConfig;
 import org.objectweb.asm.*;
 
 import java.io.File;
@@ -49,12 +49,12 @@ public class HttpApiProvider implements Opcodes {
         try {
             Class<?> clazz = method.proxyMethodInfo.getDeclaringClass();
             ApiParameterInfo[] parameterInfos = method.parameterInfos;
-            String className = "net/pocrd/autogen/ApiExecutor_" + name.replace('.', '_');
+            String className = "net.pocrd.autogen.ApiExecutor_" + name.replace('.', '_');
             className = className.replace('$', '_');
-            String classDesc = "L" + className + ";";
+            String c_name = className.replace(".", "/");
             ClassWriter cw = new PocClassWriter(ClassWriter.COMPUTE_FRAMES);
             FieldVisitor fv;
-            cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, className, null, "java/lang/Object", new String[] { Type.getInternalName(HttpApiExecutor.class) });
+            cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, c_name, null, "java/lang/Object", new String[] { Type.getInternalName(HttpApiExecutor.class) });
             {
                 fv = cw.visitField(ACC_PRIVATE, "instance", "Ljava/lang/Object;", null, null);
                 fv.visitEnd();
@@ -74,8 +74,6 @@ public class HttpApiProvider implements Opcodes {
             {
                 MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
                 mv.visitCode();
-                Label l0 = new Label();
-                mv.visitLabel(l0);
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
                 for (int i = 0; i < parameterInfos.length; i++) {
@@ -84,13 +82,10 @@ public class HttpApiProvider implements Opcodes {
                         mv.visitVarInsn(ALOAD, 0);
                         mv.visitLdcInsn(parameterInfo.verifyRegex);
                         mv.visitMethodInsn(INVOKESTATIC, "java/util/regex/Pattern", "compile", "(Ljava/lang/String;)Ljava/util/regex/Pattern;");
-                        mv.visitFieldInsn(PUTFIELD, className, REGEX_PREFIX + parameterInfo.name, "Ljava/util/regex/Pattern;");
+                        mv.visitFieldInsn(PUTFIELD, c_name, REGEX_PREFIX + parameterInfo.name, "Ljava/util/regex/Pattern;");
                     }
                 }
                 mv.visitInsn(RETURN);
-                Label l1 = new Label();
-                mv.visitLabel(l1);
-                mv.visitLocalVariable("this", classDesc, null, l0, l1, 0);
                 mv.visitMaxs(1, 1);
                 mv.visitEnd();
             }
@@ -116,7 +111,7 @@ public class HttpApiProvider implements Opcodes {
                             } else {
                                 mv.visitInsn(ACONST_NULL);
                             }
-                            mv.visitFieldInsn(PUTSTATIC, className, CONST_PREFIX + pinfo.name, Type.getType(pinfo.type).getDescriptor());
+                            mv.visitFieldInsn(PUTSTATIC, c_name, CONST_PREFIX + pinfo.name, Type.getType(pinfo.type).getDescriptor());
                         }
                     }
                     mv.visitInsn(RETURN);
@@ -127,19 +122,13 @@ public class HttpApiProvider implements Opcodes {
             {
                 MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "setInstance", "(Ljava/lang/Object;)V", null, null);
                 mv.visitCode();
-                Label l0 = new Label();
-                mv.visitLabel(l0);
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitVarInsn(ALOAD, 1);
-                mv.visitFieldInsn(PUTFIELD, className, "instance", "Ljava/lang/Object;");
+                mv.visitFieldInsn(PUTFIELD, c_name, "instance", "Ljava/lang/Object;");
                 Label l1 = new Label();
                 mv.visitLabel(l1);
                 mv.visitInsn(RETURN);
-                Label l2 = new Label();
-                mv.visitLabel(l2);
-                mv.visitLocalVariable("this", classDesc, null, l0, l2, 0);
-                mv.visitLocalVariable("obj", "Ljava/lang/Object;", null, l0, l2, 1);
-                mv.visitMaxs(2, 2);
+                mv.visitMaxs(1, 1);
                 mv.visitEnd();
             }
             {
@@ -169,7 +158,7 @@ public class HttpApiProvider implements Opcodes {
                                     pmv.visitJumpInsn(IFNULL, l2);
                                 }
                                 pmv.loadArg(0);
-                                pmv.visitFieldInsn(GETFIELD, className, REGEX_PREFIX + parameterInfo.name, "Ljava/util/regex/Pattern;");
+                                pmv.visitFieldInsn(GETFIELD, c_name, REGEX_PREFIX + parameterInfo.name, "Ljava/util/regex/Pattern;");
                                 pmv.loadArg(1);
                                 pmv.loadConst(i);
                                 pmv.visitInsn(AALOAD);
@@ -236,7 +225,7 @@ public class HttpApiProvider implements Opcodes {
                             if (!parameterInfo.needDefaultValueConstDefined) {
                                 pmv.loadConst(defaultValueString, parameterType);
                             } else {//加载定义的常量
-                                pmv.visitFieldInsn(GETSTATIC, className, CONST_PREFIX + parameterInfo.name, Type.getDescriptor(parameterInfo.type));
+                                pmv.visitFieldInsn(GETSTATIC, c_name, CONST_PREFIX + parameterInfo.name, Type.getDescriptor(parameterInfo.type));
                             }
                             pmv.visitJumpInsn(GOTO, loopLabel2);
                             pmv.visitLabel(loopLabel1);
@@ -323,7 +312,7 @@ public class HttpApiProvider implements Opcodes {
                     }
                 }
                 pmv.visitVarInsn(ALOAD, 0);
-                pmv.visitFieldInsn(GETFIELD, className, "instance", "Ljava/lang/Object;");
+                pmv.visitFieldInsn(GETFIELD, c_name, "instance", "Ljava/lang/Object;");
                 pmv.visitTypeInsn(CHECKCAST, clazz.getName().replace('.', '/'));
                 for (int i = 0; i < parameterInfos.length; i++) {
                     pmv.loadLocal("" + i);
@@ -410,7 +399,8 @@ public class HttpApiProvider implements Opcodes {
                         folder.mkdirs();
                     }
                     fos = new FileOutputStream(
-                            CommonConfig.getInstance().getAutogenPath() + File.separator + "ApiExecutor" + File.separator + name + ".class");
+                            CommonConfig.getInstance().getAutogenPath() + File.separator + "ApiExecutor"
+                                    + File.separator + className + ".class");
                     fos.write(cw.toByteArray());
                 } finally {
                     if (fos != null) {
@@ -419,7 +409,7 @@ public class HttpApiProvider implements Opcodes {
                 }
             }
             HttpApiExecutor e = (HttpApiExecutor)new PocClassLoader(Thread.currentThread().getContextClassLoader())
-                    .defineClass(className.replace('/', '.'), cw.toByteArray()).newInstance();
+                    .defineClass(className, cw.toByteArray()).newInstance();
             e.setInstance(method.serviceInstance);
             return e;
         } catch (Throwable t) {

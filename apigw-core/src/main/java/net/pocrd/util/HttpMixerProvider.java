@@ -2,10 +2,10 @@ package net.pocrd.util;
 
 import net.pocrd.core.PocClassLoader;
 import net.pocrd.define.ApiMixer;
+import net.pocrd.define.CompileConfig;
 import net.pocrd.entity.ApiMethodInfo;
 import net.pocrd.entity.ApiParameterInfo;
 import net.pocrd.entity.CommonConfig;
-import net.pocrd.define.CompileConfig;
 import org.objectweb.asm.*;
 
 import java.io.File;
@@ -40,16 +40,22 @@ public class HttpMixerProvider implements Opcodes {
     public synchronized static ApiMixer createMixerExecutor(String name, ApiMethodInfo method) {
         try {
             Class<?> clazz = method.proxyMethodInfo.getDeclaringClass();
-            String className = "net/pocrd/autogen/ApiMixer_" + name.replace('.', '_');
+            String className = "net.pocrd.autogen.ApiMixer_" + name.replace('.', '_');
             className = className.replace('$', '_');
+            String c_name = className.replace(".", "/");
             ClassWriter cw = new PocClassWriter(ClassWriter.COMPUTE_FRAMES);
-            cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, className, null, "java/lang/Object", new String[] { Type.getInternalName(ApiMixer.class) });
+            cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, c_name, null, "java/lang/Object", new String[] { Type.getInternalName(ApiMixer.class) });
             {
                 MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
                 mv.visitCode();
+                Label l0 = new Label();
+                mv.visitLabel(l0);
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
                 mv.visitInsn(RETURN);
+                Label l1 = new Label();
+                mv.visitLabel(l1);
+                mv.visitLocalVariable("this", "L" + c_name + ";", null, l0, l1, 0);
                 mv.visitMaxs(1, 1);
                 mv.visitEnd();
             }
@@ -83,9 +89,13 @@ public class HttpMixerProvider implements Opcodes {
                     pmv.visitMethodInsn(INVOKESTATIC, "net/pocrd/util/EvaluatorProvider", "getEvaluator",
                             "(Ljava/lang/Class;Ljava/lang/Class;)Lnet/pocrd/define/Evaluator;");
                     pmv.loadLocal(pname);
+
+                    // 使用注释代码替换下面三行可以使生成的代码能被 jd 反编译
+                    // pmv.visitInsn(ACONST_NULL);
                     pmv.loadArg(1);
                     pmv.loadConst(i);
                     pmv.visitInsn(AALOAD);
+
                     pmv.visitMethodInsn(INVOKEINTERFACE, "net/pocrd/define/Evaluator", "evaluate", "(Ljava/lang/Object;Ljava/lang/Object;)V");
                     pmv.visitLabel(end);
                     i++;
@@ -113,7 +123,8 @@ public class HttpMixerProvider implements Opcodes {
                         folder.mkdirs();
                     }
                     fos = new FileOutputStream(
-                            CommonConfig.getInstance().getAutogenPath() + File.separator + "ApiMixer" + File.separator + name + ".class");
+                            CommonConfig.getInstance().getAutogenPath() + File.separator + "ApiMixer"
+                                    + File.separator + className + ".class");
                     fos.write(cw.toByteArray());
                 } finally {
                     if (fos != null) {
@@ -122,7 +133,7 @@ public class HttpMixerProvider implements Opcodes {
                 }
             }
             ApiMixer e = (ApiMixer)new PocClassLoader(Thread.currentThread().getContextClassLoader())
-                    .defineClass(className.replace('/', '.'), cw.toByteArray()).newInstance();
+                    .defineClass(className, cw.toByteArray()).newInstance();
             return e;
         } catch (Throwable t) {
             throw new RuntimeException("generator failed. " + name, t);

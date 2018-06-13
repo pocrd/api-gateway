@@ -2,12 +2,12 @@ package net.pocrd.core;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import net.pocrd.define.CompileConfig;
 import net.pocrd.define.ConstField;
-import net.pocrd.entity.Serializer;
 import net.pocrd.document.Document;
 import net.pocrd.entity.ApiMethodInfo;
 import net.pocrd.entity.CommonConfig;
-import net.pocrd.define.CompileConfig;
+import net.pocrd.entity.Serializer;
 import net.pocrd.util.POJOSerializerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,10 +77,12 @@ public class InfoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (CompileConfig.isDebug) {
             try {
-                //                reloadDocument();
                 OutputStream out = resp.getOutputStream();
                 resp.setCharacterEncoding(RESP_CHARSET);
                 String queryString = req.getQueryString();
+                if (queryString.contains("reload")) {
+                    reloadDocument();
+                }
                 if (queryString == null || queryString.isEmpty()) {
                     resp.setContentType(XML_RESP_CONTENT_TYPE);
                     out.write(XML_HEAD);//链xslt

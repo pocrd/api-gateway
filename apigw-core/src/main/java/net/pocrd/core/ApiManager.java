@@ -34,7 +34,7 @@ public final class ApiManager {
 
     public ApiManager() {
     }
-    
+
     /**
      * jarfilename用来定位是哪个jar包出的问题
      */
@@ -114,57 +114,77 @@ public final class ApiManager {
 
     public static ApiMethodInfo parseMixer(Class<?> clazz) {
         HttpDataMixer mixer = clazz.getAnnotation(HttpDataMixer.class);
-        if (mixer == null) {
-            return null;
-        }
-        Method mixMethod = null;
-        for (Method m : clazz.getDeclaredMethods()) {
-            if ("mix".equals(m.getName())) {
-                if (mixMethod == null) {
-                    mixMethod = m;
-                } else {
-                    logger.warn("More than one mix method found in " + clazz.getName());
-                    return null;
+        try {
+            if (mixer == null) {
+                return null;
+            }
+            Method mixMethod = null;
+            for (Method m : clazz.getDeclaredMethods()) {
+                if ("mix".equals(m.getName())) {
+                    if (mixMethod == null) {
+                        mixMethod = m;
+                    } else {
+                        logger.warn("More than one mix method found in " + clazz.getName());
+                        return null;
+                    }
                 }
             }
-        }
-        if (mixMethod == null) {
-            logger.warn("None mix method found in " + clazz.getName());
-            return null;
-        }
-        if (!Modifier.isPublic(mixMethod.getModifiers()) || !Modifier.isStatic(mixMethod.getModifiers())) {
-            logger.warn("Mix method should be 'public' & 'static'. found in " + clazz.getName());
-            return null;
-        }
-        if (mixMethod.getParameterCount() == 0) {
-            logger.warn("Atleast one mix parameter" + clazz.getName());
-            return null;
-        }
-        ApiMethodInfo info = new ApiMethodInfo();
-        info.type = ApiMethodInfo.Type.MIXER;
-        info.methodName = mixer.name();
-        info.description = mixer.desc();
-        info.owner = mixer.owner();
-        info.returnType = mixMethod.getReturnType();
-        info.proxyMethodInfo = mixMethod;
+            if (mixMethod == null) {
+                logger.warn("None mix method found in " + clazz.getName());
+                return null;
+            }
+            if (!Modifier.isPublic(mixMethod.getModifiers()) || !Modifier.isStatic(mixMethod.getModifiers())) {
+                logger.warn("Mix method should be 'public' & 'static'. found in " + clazz.getName());
+                return null;
+            }
+            if (mixMethod.getParameterCount() == 0) {
+                logger.warn("Atleast one mix parameter" + clazz.getName());
+                return null;
+            }
+            if (mixer.name().contains(".")) {
+                logger.warn("Mixer name should not contains '.', system will add 'mixer.' prefix for it.");
+                return null;
+            }
+            ApiMethodInfo info = new ApiMethodInfo();
+            info.type = ApiMethodInfo.Type.MIXER;
+            info.methodName = "mixer." + mixer.name();
+            info.groupName = "mixer";
+            info.groupOwner = "N/A";
+            info.description = mixer.desc() + " page url:" + mixer.pagePath();
+            info.owner = mixer.owner();
+            info.returnType = mixMethod.getReturnType();
+            info.proxyMethodInfo = mixMethod;
 
-        parseReturnType(info, mixMethod, clazz);//返回结果解析,设置apiInfo.seriliazer,apiInfo.returnType, apiInfo.actuallyGenericType
-        //递归检查返回结果类型
-        TypeCheckUtil.recursiveCheckReturnType(clazz.getName(), info.returnType, info.actuallyGenericReturnType,
-                new SerializableImplChecker(), new DescriptionAnnotationChecker(),
-                new PublicFieldChecker());
+            parseReturnType(info, mixMethod, clazz);//返回结果解析,设置apiInfo.seriliazer,apiInfo.returnType, apiInfo.actuallyGenericType
+            //递归检查返回结果类型
+            TypeCheckUtil.recursiveCheckReturnType(clazz.getName(), info.returnType, info.actuallyGenericReturnType,
+                    new SerializableImplChecker(), new DescriptionAnnotationChecker(),
+                    new PublicFieldChecker());
 
-        Parameter[] params = mixMethod.getParameters();
-        ApiParameterInfo[] pInfos = new ApiParameterInfo[params.length];
-        for (int i = 0; i < params.length; i++) {
-            Parameter p = params[i];
-            ApiParameterInfo pInfo = new ApiParameterInfo();
-            pInfo.type = p.getType();
-            pInfo.name = p.getName();
-            pInfos[i] = pInfo;
+            Parameter[] params = mixMethod.getParameters();
+            ApiParameterInfo[] pInfos = new ApiParameterInfo[params.length];
+            for (int i = 0; i < params.length; i++) {
+                Parameter p = params[i];
+                ApiParameterInfo pInfo = new ApiParameterInfo();
+                pInfo.type = p.getType();
+                pInfo.name = p.getName();
+                pInfos[i] = pInfo;
+                if (pInfo.type.getAnnotation(Description.class) == null) {
+                    logger.warn("Any param of a mixer should be annotated by Description. " + clazz.getName() + "  " + pInfo.name);
+                    return null;
+                }
+                // 此处以返回值数据结构标准作为要求, 因为此类接口实际上是由服务端的返回值来为参数赋值的
+                TypeCheckUtil.recursiveCheckReturnType(clazz.getName(), pInfo.type, null,
+                        new DescriptionAnnotationChecker(), new SerializableImplChecker(),
+                        new PublicFieldChecker());
+            }
+            info.parameterInfos = pInfos;
+            info.state = ApiOpenState.OPEN;
+            return info;
+        } catch (Exception e) {
+            logger.error("parse mixer failed. " + clazz.getName(), e);
         }
-        info.parameterInfos = pInfos;
-        return info;
+        return null;
     }
 
     public static List<ApiMethodInfo> parseApi(Class<?> clazz) {
@@ -256,6 +276,16 @@ public final class ApiManager {
                     apiInfo.methodName = api.name();
                     apiInfo.owner = api.owner();
                     apiInfo.groupOwner = groupAnnotation.owner();
+
+                    if (apiInfo.description == null || apiInfo.description.trim().length() == 0) {
+                        throw new RuntimeException("description missing in " + clazz.getName() + " " + api.name());
+                    }
+                    if (apiInfo.owner == null || apiInfo.owner.trim().length() == 0) {
+                        throw new RuntimeException("owner missing in " + clazz.getName() + " " + api.name());
+                    }
+                    if (apiInfo.groupOwner == null || apiInfo.groupOwner.trim().length() == 0) {
+                        throw new RuntimeException("group owner missing in " + clazz.getName() + " " + api.name());
+                    }
                     SparseIntArray code2index = new SparseIntArray();
                     DesignedErrorCode errors = mInfo.getAnnotation(DesignedErrorCode.class);
                     if (errors != null && errors.value() != null) {
@@ -268,8 +298,8 @@ public final class ApiManager {
                                 AbstractReturnCode c = ReturnCodeContainer.findCode(es[i]);
                                 if (c.getDisplay() != c) {
                                     throw new RuntimeException(
-                                            "cannot use a shadow code as a designed code " + c.getCode() + " in " + clazz.getName() + " " + api
-                                                    .name());
+                                            "cannot use a shadow code as a designed code " + c.getCode() + " in "
+                                                    + clazz.getName() + " " + api.name());
                                 }
                                 apiInfo.errorCodes[i] = c;
                                 apiInfo.errors[i] = c.getCode();
@@ -348,23 +378,26 @@ public final class ApiManager {
                     Class<?>[] parameterTypes = mInfo.getParameterTypes();
                     Annotation[][] parameterAnnotations = mInfo.getParameterAnnotations();
                     if (parameterTypes.length != parameterAnnotations.length) {
-                        throw new RuntimeException("存在未被标记的http api参数" + clazz.getName());
+                        throw new RuntimeException("存在未被标记的http api参数" + clazz.getName() + " " + mInfo.getName());
                     }
                     // 校验授权接口注释是否符合规范
                     if (apiInfo.authenticationMethod) {
                         if (parameterAnnotations[0].length == 0
                                 || parameterAnnotations[0][0].getClass() != ApiAutowired.class
                                 || !AutowireableParameter.userid.equals(((ApiAutowired)parameterAnnotations[0][0]).value())) {
-                            throw new RuntimeException("authentication method must tag the first parameter as Autowired(userid).");
+                            throw new RuntimeException("authentication method must tag the first parameter as Autowired(userid)."
+                                    + clazz.getName() + " " + api.name());
                         }
                         if (parameterAnnotations[1].length == 0
                                 || parameterAnnotations[1][0].getClass() != ApiParameter.class
                                 || ((ApiParameter)parameterAnnotations[1][0]).enumDef() == EnumNull.class) {
-                            throw new RuntimeException("authentication method must tag the second parameter as ApiParameter with a enum define.");
+                            throw new RuntimeException("authentication method must tag the second parameter as ApiParameter with a enum define."
+                                    + clazz.getName() + " " + api.name());
                         }
                         if (parameterAnnotations[2].length == 0
                                 || parameterAnnotations[2][0].getClass() != ApiParameter.class) {
-                            throw new RuntimeException("authentication method must tag the third parameter as ApiParameter");
+                            throw new RuntimeException("authentication method must tag the third parameter as ApiParameter"
+                                    + clazz.getName() + " " + api.name());
                         }
                     }
                     ApiParameterInfo[] pInfos = new ApiParameterInfo[parameterTypes.length];
@@ -373,7 +406,7 @@ public final class ApiManager {
                         pInfo.type = parameterTypes[i];
                         Annotation[] a = parameterAnnotations[i];
                         if (a == null || a.length == 0) {
-                            throw new RuntimeException("api参数未被标记" + clazz.getName());
+                            throw new RuntimeException("api参数未被标记" + clazz.getName() + " " + api.name());
                         }
                         {
                             //入参的递归检查
@@ -383,7 +416,7 @@ public final class ApiManager {
                                     try {
                                         genericType = ((ParameterizedType)mInfo.getGenericParameterTypes()[i]).getActualTypeArguments()[0];
                                     } catch (Throwable t) {
-                                        throw new RuntimeException("unsupported input type,get genericType failed, method name:" + mInfo.getName(),
+                                        throw new RuntimeException("unsupported input type,get genericType failed, method name:" + api.name(),
                                                 t);
                                     }
                                     try {
@@ -431,11 +464,11 @@ public final class ApiManager {
                                                 Integer.parseInt(pInfo.sequence.substring(4));
                                             } else {
                                                 throw new RuntimeException("invalid sequence value("
-                                                        + pInfo.sequence + ") of api parameter " + mInfo.getName() + "  " + pInfo.name);
+                                                        + pInfo.sequence + ") of api parameter " + api.name() + "  " + pInfo.name);
                                             }
                                         } catch (Exception e) {
                                             throw new RuntimeException("invalid sequence value("
-                                                    + pInfo.sequence + ") of api parameter " + mInfo.getName() + "  " + pInfo.name, e);
+                                                    + pInfo.sequence + ") of api parameter " + api.name() + "  " + pInfo.name, e);
                                         }
                                     }
                                     // '_'前缀被用于标识本系统的通用参数
@@ -443,7 +476,7 @@ public final class ApiManager {
                                     if (!SecurityType.Integrated.check(api.security())) {
                                         if (pInfo.name.startsWith("_")) {
                                             throw new RuntimeException(
-                                                    "api parameter name cannot start with '_'" + mInfo.getName() + "  " + pInfo.name);
+                                                    "api parameter name cannot start with '_'" + api.name() + "  " + pInfo.name);
                                         }
                                     }
                                 }

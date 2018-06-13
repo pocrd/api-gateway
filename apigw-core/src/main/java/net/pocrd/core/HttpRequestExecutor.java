@@ -1250,6 +1250,7 @@ public class HttpRequestExecutor {
                 logger.error("dubbo service exception.", t);
                 call.setReturnCode(ApiReturnCode.DUBBO_SERVICE_ERROR);
             } else if (t instanceof com.alibaba.dubbo.rpc.RpcException) {
+                // TODO 流控时此处会打印大量错误, 极耗 CPU, 优化此处代码, 区分出流控情况, 不打日志
                 logger.error("dubbo exception.", t);
                 call.setReturnCode(ApiReturnCode.DUBBO_SERVICE_NOTFOUND_ERROR);
             } else {

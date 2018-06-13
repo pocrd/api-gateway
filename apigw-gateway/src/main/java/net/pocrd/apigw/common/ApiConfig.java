@@ -12,8 +12,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class ApiConfig {
-    private static final Logger logger                 = LoggerFactory.getLogger(ApiConfig.class);
-    private static final String DEFAULT_SEVICE_VERSION = "default";
+    private static final Logger logger                  = LoggerFactory.getLogger(ApiConfig.class);
+    private static final String DEFAULT_SERVICE_VERSION = "default";
     private static Properties prop;
 
     private ApiConfig() {
@@ -31,7 +31,7 @@ public class ApiConfig {
             if (prop == null) {
                 try {
                     logger.warn("missing call ApiConfig.init(), try to load api.config");
-                    InputStream is = CommonConfig.class.getResourceAsStream("/api.config");
+                    InputStream is = ApiConfig.class.getResourceAsStream("/api.config");
                     if (is != null) {
                         prop = new Properties();
                         prop.load(is);
@@ -114,7 +114,7 @@ public class ApiConfig {
 
     private void setServiceVersion(String serviceVersion) {
         if (serviceVersion != null && !serviceVersion.isEmpty()) {
-            if (!serviceVersion.trim().isEmpty() && !serviceVersion.equalsIgnoreCase(DEFAULT_SEVICE_VERSION)) {
+            if (!serviceVersion.trim().isEmpty() && !serviceVersion.equalsIgnoreCase(DEFAULT_SERVICE_VERSION)) {
                 this.serviceVersion = serviceVersion;
             } else {
                 this.serviceVersion = "";

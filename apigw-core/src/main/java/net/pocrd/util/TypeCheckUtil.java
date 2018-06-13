@@ -282,7 +282,7 @@ public class TypeCheckUtil {
     }
 
     /**
-     * 在启动时对每个api的入参进行递归检查
+     * 在启动时对每个api的入参进行递归检查, 目前入参不支持使用 Dynamic Entity 对象
      *
      * @param serviceInterfaceName dubbo接口名
      * @param inputType            返回类型

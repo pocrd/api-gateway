@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by rendong on 2018/6/8.
  */
-@HttpDataMixer(name = "demo.demoMix", desc = "测试mixer", owner = "demo", pagePath = "/demo.html")
+@HttpDataMixer(name = "demoMix", desc = "测试mixer", owner = "demo", pagePath = "/demo.html")
 public class DemoMixer {
     @Description("Result")
     public static class Result implements Serializable {
