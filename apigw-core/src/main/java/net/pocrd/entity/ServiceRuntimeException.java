@@ -21,11 +21,11 @@ public class ServiceRuntimeException extends RuntimeException implements Seriali
     private ServiceRuntimeException() {
     }
 
-    protected ServiceRuntimeException(AbstractReturnCode code) {
+    public ServiceRuntimeException(AbstractReturnCode code) {
         this(code, code.getDesc());
     }
 
-    protected ServiceRuntimeException(AbstractReturnCode code, String msg) {
+    public ServiceRuntimeException(AbstractReturnCode code, String msg) {
         super("code:" + code.getCode() + " desc:" + code.getDesc() + " msg:" + msg);
         this.code = code.getCode();
         this.displayCode = code.getDisplay().getCode();
@@ -33,11 +33,11 @@ public class ServiceRuntimeException extends RuntimeException implements Seriali
         this.msg = msg;
     }
 
-    protected ServiceRuntimeException(AbstractReturnCode code, Throwable t) {
+    public ServiceRuntimeException(AbstractReturnCode code, Throwable t) {
         this(code, code.getDesc(), t);
     }
 
-    protected ServiceRuntimeException(AbstractReturnCode code, String msg, Throwable t) {
+    public ServiceRuntimeException(AbstractReturnCode code, String msg, Throwable t) {
         super("code:" + code.getCode() + " desc:" + code.getDesc() + " msg:" + msg, t);
         this.code = code.getCode();
         this.displayCode = code.getDisplay().getCode();
@@ -45,7 +45,7 @@ public class ServiceRuntimeException extends RuntimeException implements Seriali
         this.msg = msg;
     }
 
-    protected ServiceRuntimeException(String msg, ServiceException se) {
+    public ServiceRuntimeException(String msg, ServiceException se) {
         super("code:" + se.getCode() + " desc:" + se.getDescription() + " msg:" + msg, se);
         this.code = se.getCode();
         this.displayCode = se.getDisplayCode();

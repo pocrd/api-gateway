@@ -1246,11 +1246,9 @@ public class HttpRequestExecutor {
             } else if (t.getCause() instanceof com.alibaba.dubbo.remoting.TimeoutException) {
                 logger.error("dubbo timeout.", t);
                 call.setReturnCode(ApiReturnCode.DUBBO_SERVICE_TIMEOUT_ERROR);
-            } else if (t.getCause() instanceof com.alibaba.dubbo.remoting.RemotingException) {
-                logger.error("dubbo service exception.", t);
-                call.setReturnCode(ApiReturnCode.DUBBO_SERVICE_ERROR);
             } else if (t instanceof com.alibaba.dubbo.rpc.RpcException) {
                 // TODO 流控时此处会打印大量错误, 极耗 CPU, 优化此处代码, 区分出流控情况, 不打日志
+                // 尝试升级到高版本 dubbo 看此问题是否修复
                 logger.error("dubbo exception.", t);
                 call.setReturnCode(ApiReturnCode.DUBBO_SERVICE_NOTFOUND_ERROR);
             } else {

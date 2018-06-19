@@ -18,7 +18,7 @@ public abstract class AbstractReturnCode implements Serializable {
     /**
      * 初始化一个对外暴露的ReturnCode(用于客户端异常处理)
      */
-    public AbstractReturnCode(String desc, int code) {
+    protected AbstractReturnCode(String desc, int code) {
         this.desc = desc;
         this.code = code;
         this.display = this;
@@ -27,7 +27,7 @@ public abstract class AbstractReturnCode implements Serializable {
     /**
      * 初始化一个不对外暴露的ReturnCode(仅用于服务端数据分析)
      */
-    public AbstractReturnCode(int code, AbstractReturnCode displayAs) {
+    protected AbstractReturnCode(int code, AbstractReturnCode displayAs) {
         this.desc = null;
         this.code = code;
         this.display = displayAs;
