@@ -6,6 +6,7 @@ import net.pocrd.define.CompileConfig;
 import net.pocrd.define.ConstField;
 import net.pocrd.define.Evaluator;
 import net.pocrd.entity.CommonConfig;
+import net.pocrd.responseEntity.DynamicEntity;
 import org.objectweb.asm.*;
 
 import java.io.File;
@@ -122,14 +123,30 @@ public class EvaluatorProvider implements Opcodes {
                                     pmv.visitVarInsn(ALOAD, 2);
                                     pmv.visitFieldInsn(GETFIELD, r_name, name, Type.getDescriptor(fr.getType()));
                                     pmv.visitFieldInsn(PUTFIELD, l_name, name, Type.getDescriptor(fl.getType()));
+                                } if (fl.getType() == DynamicEntity.class) {
+                                    // 如果是 DynamicEntity 类型, 则直接赋值
+                                    pmv.visitVarInsn(ALOAD, 1);
+                                    pmv.visitVarInsn(ALOAD, 2);
+                                    pmv.visitFieldInsn(GETFIELD, r_name, name, Type.getDescriptor(fr.getType()));
+                                    pmv.visitFieldInsn(PUTFIELD, l_name, name, Type.getDescriptor(fl.getType()));
                                 } else {
-                                    if (fl.getType() == List.class && fl.getAnnotation(Description.class) != null
+                                    if (fl.getType() == List.class
+                                            && fl.getAnnotation(Description.class) != null
                                             && fr.getAnnotation(Description.class) != null) {
                                         Class lgc = TypeCheckUtil.getSupportedGenericClass(fl.getGenericType(), leftClass.getName()
                                                 + " " + fl.getName());
                                         Class rgc = TypeCheckUtil.getSupportedGenericClass(fr.getGenericType(), rightClass.getName()
                                                 + " " + fr.getName());
-                                        if (lgc.getAnnotation(Description.class) != null && rgc.getAnnotation(Description.class) != null) {
+                                        if (lgc == DynamicEntity.class && rgc == DynamicEntity.class) {
+                                            // 如果是 List<DynamicEntity> 类型, 则直接赋值
+                                            pmv.visitVarInsn(ALOAD, 1);
+                                            pmv.visitVarInsn(ALOAD, 2);
+                                            pmv.visitFieldInsn(GETFIELD, r_name, name, Type.getDescriptor(fr.getType()));
+                                            pmv.visitFieldInsn(PUTFIELD, l_name, name, Type.getDescriptor(fl.getType()));
+                                        } else if (lgc.getAnnotation(Description.class) != null
+                                                && rgc.getAnnotation(Description.class) != null
+                                                && lgc != DynamicEntity.class
+                                                && rgc != DynamicEntity.class) {
                                             createInnerClassVisitor(cw, innerClasses, lgc);
                                             createInnerClassVisitor(cw, innerClasses, rgc);
                                             String getter = createEvaluatorGetter(cw, c_name, getters, lgc, rgc);
@@ -245,7 +262,9 @@ public class EvaluatorProvider implements Opcodes {
                             } else if (fl.getAnnotation(Description.class) != null
                                     && fr.getAnnotation(Description.class) != null
                                     && fl.getType().getAnnotation(Description.class) != null
-                                    && fr.getType().getAnnotation(Description.class) != null) {
+                                    && fr.getType().getAnnotation(Description.class) != null
+                                    && fl.getType() != DynamicEntity.class
+                                    && fr.getType() != DynamicEntity.class) {
 
                                 createInnerClassVisitor(cw, innerClasses, fl.getType());
                                 createInnerClassVisitor(cw, innerClasses, fr.getType());

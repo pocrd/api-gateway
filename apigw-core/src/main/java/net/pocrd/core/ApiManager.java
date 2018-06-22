@@ -155,6 +155,13 @@ public final class ApiManager {
             info.returnType = mixMethod.getReturnType();
             info.proxyMethodInfo = mixMethod;
 
+            if (info.description == null || info.description.trim().length() < 15) {
+                throw new RuntimeException("description is too simple in " + clazz.getName() + " " + mixer.name());
+            }
+            if (info.owner == null || info.owner.trim().length() == 0) {
+                throw new RuntimeException("owner missing in " + clazz.getName() + " " + mixer.name());
+            }
+
             parseReturnType(info, mixMethod, clazz);//返回结果解析,设置apiInfo.seriliazer,apiInfo.returnType, apiInfo.actuallyGenericType
             //递归检查返回结果类型
             TypeCheckUtil.recursiveCheckReturnType(clazz.getName(), info.returnType, info.actuallyGenericReturnType,
@@ -168,6 +175,8 @@ public final class ApiManager {
                 ApiParameterInfo pInfo = new ApiParameterInfo();
                 pInfo.type = p.getType();
                 pInfo.name = p.getName();
+                pInfo.description = "待合并返回值, 请使用返回值类型结构相似的接口作为参数";
+                pInfo.isRequired = true;
                 pInfos[i] = pInfo;
                 if (pInfo.type.getAnnotation(Description.class) == null) {
                     logger.warn("Any param of a mixer should be annotated by Description. " + clazz.getName() + "  " + pInfo.name);

@@ -1108,6 +1108,7 @@ public class HttpRequestExecutor {
                                 i++;
                             }
                             call.result = method.wrapper.wrap(apiManager.processMix(method.methodName, objs));
+                            call.setReturnCode(ApiReturnCode.SUCCESS);
                             return;
                         default: throw new RuntimeException("UNKNOWN method type " + method.type);
                     }

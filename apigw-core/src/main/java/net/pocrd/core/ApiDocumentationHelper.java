@@ -3,16 +3,16 @@ package net.pocrd.core;
 import net.pocrd.annotation.Description;
 import net.pocrd.annotation.DynamicStructure;
 import net.pocrd.annotation.EnumDef;
+import net.pocrd.annotation.HttpDataMixer;
+import net.pocrd.define.AbstractReturnCode;
 import net.pocrd.define.CommonParameter;
 import net.pocrd.define.ConstField;
 import net.pocrd.define.ServiceInjectable;
 import net.pocrd.document.*;
-import net.pocrd.define.AbstractReturnCode;
 import net.pocrd.entity.ApiMethodInfo;
 import net.pocrd.entity.ApiParameterInfo;
 import net.pocrd.entity.ReturnCodeContainer;
 import net.pocrd.responseEntity.*;
-import net.pocrd.responseEntity.RawString;
 import net.pocrd.util.StringUtil;
 import net.pocrd.util.TypeCheckUtil;
 import org.slf4j.Logger;
@@ -52,6 +52,7 @@ public class ApiDocumentationHelper {
             for (ApiMethodInfo info : apis) {
                 MethodInfo methodInfo = new MethodInfo();
                 methodInfo.description = info.description;
+                methodInfo.methodType = info.type.name();
                 methodInfo.detail = info.detail;
                 methodInfo.groupName = info.groupName;
                 methodInfo.methodName = info.methodName;
@@ -144,6 +145,11 @@ public class ApiDocumentationHelper {
                 }
                 if (info.parameterInfos != null && info.parameterInfos.length > 0) {
                     methodInfo.parameterInfoList = getParamInfoList(info.groupName, info.parameterInfos);
+                    if (info.type == ApiMethodInfo.Type.MIXER) {
+                        for (ParameterInfo p : methodInfo.parameterInfoList) {
+                            p.description = "待合并返回值, 请使用返回值类型结构与 " + p.type + " 相似的接口作为参数";
+                        }
+                    }
                     Set<TypeStruct> reqStructSet = getParamTypeStruct(info.groupName, info.parameterInfos);
                     if (reqStructSet != null && reqStructSet.size() > 0) {
                         methodInfo.reqStructList = new ArrayList<TypeStruct>(reqStructSet);
@@ -822,15 +828,46 @@ public class ApiDocumentationHelper {
     }
 
     private String getEntityName(String group, Class<?> type) {
-        return (group == null || group.length() == 0 || type.getName().startsWith(
-                ConstField.coreEntityPackage)) ? "Api_" + type.getSimpleName() : "Api_" + group.toUpperCase() + "_" + type.getSimpleName();
+        Class eClass = type.getEnclosingClass();
+        boolean mixerEntity = false;
+        while (eClass != null) {
+            if (eClass.getAnnotation(HttpDataMixer.class) != null) {
+                mixerEntity = true;
+                break;
+            }
+            eClass = eClass.getEnclosingClass();
+        }
+        if (group == null || group.length() == 0 || type.getName().startsWith(ConstField.coreEntityPackage)) {
+            return "Api_" + type.getSimpleName();
+        } else {
+            if (mixerEntity) {
+                return "Api_" + group.toUpperCase() + "_" + eClass.getSimpleName() + "_" + type.getSimpleName();
+            } else {
+                return "Api_" + group.toUpperCase() + "_" + type.getSimpleName();
+            }
+        }
     }
 
     private String getEntityName4CollectionAndArray(String group, Class<?> type) {
-        return (group == null || group.length() == 0 || type.getName().startsWith(
-                ConstField.coreEntityPackage)) ?
-                "Api_" + type.getSimpleName() + "_ArrayResp" :
-                "Api_" + group.toUpperCase() + "_" + type.getSimpleName() + "_ArrayResp";
+        Class eClass = type.getEnclosingClass();
+        boolean mixerEntity = false;
+        while (eClass != null) {
+            if (eClass.getAnnotation(HttpDataMixer.class) != null) {
+                mixerEntity = true;
+                break;
+            }
+            eClass = eClass.getEnclosingClass();
+        }
+        if (group == null || group.length() == 0 || type.getName().startsWith(ConstField.coreEntityPackage)) {
+            return "Api_" + type.getSimpleName() + "_ArrayResp";
+        } else {
+            if (mixerEntity) {
+                return "Api_" + group.toUpperCase() + "_" + eClass.getSimpleName() + "_" + type.getSimpleName() + "_ArrayResp";
+            } else {
+                return "Api_" + group.toUpperCase() + "_" + type.getSimpleName() + "_ArrayResp";
+            }
+
+        }
     }
 
     private boolean hasPublicFields(Class<?> clazz) {

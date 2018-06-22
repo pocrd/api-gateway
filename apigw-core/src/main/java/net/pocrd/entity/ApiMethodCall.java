@@ -80,12 +80,12 @@ public class ApiMethodCall {
     /**
      * 返回值代码
      */
-    private int returnCode = ApiReturnCode.SUCCESS.getCode();
+    private int returnCode;
 
     /**
      * 原始返回值代码，用于记录业务函数的原始返回代码
      */
-    private int originCode = ApiReturnCode.SUCCESS.getCode();
+    private int originCode;
 
     /**
      * 返回消息

@@ -12,6 +12,8 @@ import java.util.List;
 public class MethodInfo implements Serializable {
     @Description("返回值类型")
     public String              returnType;
+    @Description("接口类型")
+    public String              methodType;
     @Description("接口名")
     public String              methodName;
     @Description("接口简介")

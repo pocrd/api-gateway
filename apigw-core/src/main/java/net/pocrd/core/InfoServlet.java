@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -76,11 +77,12 @@ public class InfoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (CompileConfig.isDebug) {
+            OutputStream out = null;
             try {
-                OutputStream out = resp.getOutputStream();
+                out = resp.getOutputStream();
                 resp.setCharacterEncoding(RESP_CHARSET);
                 String queryString = req.getQueryString();
-                if (queryString.contains("reload")) {
+                if (queryString != null && queryString.contains("reload")) {
                     reloadDocument();
                 }
                 if (queryString == null || queryString.isEmpty()) {
@@ -102,8 +104,12 @@ public class InfoServlet extends HttpServlet {
                 }
             } catch (Throwable t) {
                 logger.error("parse xml for api info failed.", t);
-                resp.getWriter().write(t.getMessage());
-                t.printStackTrace(resp.getWriter());
+                PrintWriter pw = new PrintWriter(out);
+                if (t.getMessage() != null) {
+                    pw.write(t.getMessage());
+                }
+                t.printStackTrace(pw);
+                pw.flush();
             }
         } else {
             OutputStream out = resp.getOutputStream();

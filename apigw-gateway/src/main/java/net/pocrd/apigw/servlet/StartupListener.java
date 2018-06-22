@@ -229,7 +229,10 @@ public class StartupListener implements ServletContextListener {
                                         if (name.length() > 0) {
                                             List<Class<?>> classes = ClassUtil.getAllMixerClasses(jf, name);
                                             for (Class clazz : classes) {
-                                                mixers.add(mgr.parseMixer(clazz));
+                                                ApiMethodInfo info = mgr.parseMixer(clazz);
+                                                if (info != null) {
+                                                    mixers.add(info);
+                                                }
                                             }
                                         }
                                     }

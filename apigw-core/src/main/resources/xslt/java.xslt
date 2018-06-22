@@ -22,7 +22,6 @@ import ${pkg}.api.resp.*;
  * <xsl:value-of select="description"/>
  * <xsl:if test="string-length(detail)&gt;0"><xsl:value-of select="detail"/></xsl:if>
  * @author <xsl:choose><xsl:when test="string-length(methodOwner)&gt;0"><xsl:value-of select="methodOwner"/></xsl:when><xsl:when test="string-length(groupOwner)&gt;0"><xsl:value-of select="groupOwner"/></xsl:when><xsl:otherwise>rendong</xsl:otherwise></xsl:choose>
- *
  */
 public class <xsl:call-template name="getClassName">
                <xsl:with-param name="name" select="methodName" />
@@ -31,8 +30,31 @@ public class <xsl:call-template name="getClassName">
       <xsl:if test="count(parameterInfoList/parameterInfo[isRequired='true' and isRsaEncrypt='true'])&gt;0">
     private RsaHelper rsaHelper = null;
       </xsl:if>
+    <xsl:if test="'MIXER'=methodType">
+    private BaseRequest[] dependencies = null;
+
+    protected BaseRequest[] getDependencies() {
+        return dependencies;
+    }
+
     /**
-     * 当前请求的构造函数，以下参数为该请求的必填参数<xsl:for-each select="parameterInfoList/parameterInfo"><xsl:call-template name="RequiredParameterComment"><xsl:with-param name="methodName" select="$methodName"/></xsl:call-template></xsl:for-each>
+     * 当前mix请求的构造函数, 服务端匹配"参数接口返回值类型和本接口参数类型"的成员变量名以及
+     * 类型来进行赋值。请详细查询文档后根据输入参数类型结构决定用哪个接口的返回值作为参数。
+     * <xsl:for-each select="parameterInfoList/parameterInfo"><xsl:call-template name="RequiredParameterComment"><xsl:with-param name="methodName" select="$methodName"/></xsl:call-template></xsl:for-each>
+     */
+    public <xsl:call-template name="getClassName">
+               <xsl:with-param name="name" select="methodName" />
+             </xsl:call-template>(<xsl:call-template name="MixerParameter" />) {
+        super("<xsl:value-of select="methodName"></xsl:value-of>", SecurityType.<xsl:value-of select="securityLevel"></xsl:value-of>);
+
+        dependencies = new BaseRequest[<xsl:value-of select="count(parameterInfoList/parameterInfo[isRequired = 'true'])"></xsl:value-of>];<xsl:for-each select="parameterInfoList/parameterInfo[isRequired = 'true']">
+        dependencies[<xsl:value-of select="position()-1"></xsl:value-of>] = <xsl:call-template name="renameKeyword"><xsl:with-param name="name" select="name"/></xsl:call-template>;</xsl:for-each>
+    }
+    </xsl:if>
+    <xsl:if test="'DUBBO'=methodType">  
+    /**
+     * 当前请求的构造函数，以下参数为该请求的必填参数
+     * <xsl:for-each select="parameterInfoList/parameterInfo"><xsl:call-template name="RequiredParameterComment"><xsl:with-param name="methodName" select="$methodName"/></xsl:call-template></xsl:for-each>
      */
     public <xsl:call-template name="getClassName">
                <xsl:with-param name="name" select="methodName" />
@@ -47,6 +69,7 @@ public class <xsl:call-template name="getClassName">
             throw new LocalException("SERIALIZE_ERROR", LocalException.SERIALIZE_ERROR, e);
         }</xsl:if>
     }
+    </xsl:if>
     <xsl:if test="count(parameterInfoList/parameterInfo[isRequired = 'true'])&gt;0">
     /**
      * 私有的默认构造函数，请勿使用
@@ -226,6 +249,15 @@ public class <xsl:call-template name="getClassName">
     <xsl:param name="methodName"/>
     <xsl:if test="isRequired = 'true'">
      * @param <xsl:call-template name="renameKeyword"><xsl:with-param name="name" select="name"/></xsl:call-template><xsl:value-of select="' '"/><xsl:value-of select="description"/></xsl:if>
+  </xsl:template>
+  <xsl:template name="MixerParameter">
+      <xsl:for-each select="parameterInfoList/parameterInfo[isRequired='true']">
+          <xsl:value-of select="'BaseRequest '"/>
+          <xsl:call-template name="renameKeyword"><xsl:with-param name="name" select="name"/></xsl:call-template>
+          <xsl:if test="position()!=last()">
+              <xsl:value-of select="', '"/>
+          </xsl:if>
+      </xsl:for-each>
   </xsl:template>
   <xsl:template name="RequiredParameter">
       <xsl:for-each select="parameterInfoList/parameterInfo[isRequired='true']">
