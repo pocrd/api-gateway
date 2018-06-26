@@ -57,22 +57,18 @@ public enum SecurityType {
     UserAuth(0x0200),
 
     /**
-     * 内部用户认证，
-     * 验证要素
-     * 1. 设备签名
-     * 2. 用户token
-     * 3. 内网ip
-     */
-    InternalUser(0x0400),
-
-    /**
      * 子系统用户认证. eg. 供应商系统用户
      * 验证要素
      * 1. 设备签名
      * 2. 用户token
      * 3. 子系统标识
      */
-    SubSystemUser(0x1000),
+    SubSystemUser(0x0400),
+
+    /**
+     * 低12位做个人用户认证所用
+     * 高位留做他用
+     */
 
     /**
      * 第三方集成认证, 验证第三方证书签名
@@ -87,7 +83,7 @@ public enum SecurityType {
     /**
      * 对于只需要生成文档不产生代理的接口,设置本安全级别(本安全级别无业务含义)
      */
-    Document(0xF0000000);
+    Document(0x80000000);
 
     private int code;
 

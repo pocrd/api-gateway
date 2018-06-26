@@ -6,6 +6,7 @@ import net.pocrd.entity.CallerInfo;
 import net.pocrd.util.AESTokenHelper;
 import net.pocrd.util.AesHelper;
 import net.pocrd.util.Base64Util;
+import net.pocrd.util.HexStringUtil;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -99,5 +100,42 @@ public class AESTokenHelperTest {
         assertEquals(callerInfo.expire, callerInfo1.expire);
         assertArrayEquals(callerInfo.key, callerInfo1.key);
         assertEquals(callerInfo.securityLevel, callerInfo1.securityLevel);
+    }
+
+    @Test
+    public void generateTestToken() {
+        byte[] key = HexStringUtil.toByteArray("581bb3c7f2d09e4d2f07f69706fff13f261f4cfa2038cd2ab7bb46040ca2d568");
+
+        CallerInfo deviceToken = new CallerInfo();
+        deviceToken.appid = 1;
+        deviceToken.deviceId = 1414807058834L;
+        deviceToken.expire = System.currentTimeMillis() + 10000000000L;
+        deviceToken.key = key;
+        deviceToken.securityLevel = SecurityType.RegisteredDevice.authorize(0);
+
+        CallerInfo userToken = new CallerInfo();
+        userToken.uid = 22L;
+        userToken.appid = 1;
+        userToken.deviceId = 1414807058834L;
+        userToken.expire = System.currentTimeMillis() + 10000000000L;
+        userToken.key = key;
+        userToken.securityLevel = SecurityType.UserLogin.authorize(SecurityType.RegisteredDevice.authorize(0));
+
+        CallerInfo subSystemUserToken = new CallerInfo();
+        subSystemUserToken.uid = 22L;
+        subSystemUserToken.appid = 1;
+        subSystemUserToken.deviceId = 1414807058834L;
+        subSystemUserToken.expire = System.currentTimeMillis() + 10000000000L;
+        subSystemUserToken.key = key;
+        subSystemUserToken.subSystemId = 555;
+        subSystemUserToken.subSystemRole = "TEST";
+        subSystemUserToken.subSystemMainId = 123456789012345L;
+        subSystemUserToken.securityLevel = SecurityType.SubSystemUser
+                .authorize(SecurityType.UserLogin.authorize(SecurityType.RegisteredDevice.authorize(0)));
+
+        AESTokenHelper aesTokenHelper = new AESTokenHelper("Q/KFvy6blE0vbKkzXoPwpzUrNN538GK90M+kfM2mCBM=");
+        System.out.println("deviceToken:" + aesTokenHelper.generateToken(deviceToken));
+        System.out.println("userToken:" + aesTokenHelper.generateToken(userToken));
+        System.out.println("subSystemUserToken:" + aesTokenHelper.generateToken(subSystemUserToken));
     }
 }
