@@ -22,5 +22,5 @@ public @interface ApiAutowired {
      */
     Class<? extends ServiceInjectable.InjectionData> serviceInjectDataType() default ServiceInjectable.InjectionData.class;
 
-    String serviceInjectName();
+    String serviceInjectName() default "";
 }
