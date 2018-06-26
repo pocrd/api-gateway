@@ -5,7 +5,12 @@ package net.pocrd.define;
  */
 public interface ServiceInjectable {
     /**
-     * 该参数的逻辑名称, 例如 product.productids
+     * 设置该参数的逻辑名称, 例如 product.productids
+     */
+    void setName(String name);
+
+    /**
+     * 获取该参数的逻辑名称
      */
     String getName();
 
@@ -15,7 +20,7 @@ public interface ServiceInjectable {
     InjectionData parseDataFromHttpParam(String param);
 
     /**
-     * 返回其对应的数据类型
+     * 获取对应的数据类型
      */
     Class<? extends InjectionData> getDataType();
 

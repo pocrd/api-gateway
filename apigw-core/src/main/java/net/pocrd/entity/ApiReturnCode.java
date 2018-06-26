@@ -82,9 +82,12 @@ public class ApiReturnCode extends AbstractReturnCode {
     /**
      * 请求解析异常, mt参数中接口依赖层次过多
      */
-    public final static int                _C_TOO_MANY_DEPENDENT_LEVEL = -121;
+    public final static int                _C_TOO_MANY_DEPENDENT_LEVEL = -122;
     public final static AbstractReturnCode TOO_MANY_DEPENDENT_LEVEL    = new ApiReturnCode(_C_TOO_MANY_DEPENDENT_LEVEL, UNKNOWN_METHOD);
 
+    /**
+     * 参数错误
+     */
     public final static int                _C_PARAMETER_ERROR = -140;
     public final static AbstractReturnCode PARAMETER_ERROR    = new ApiReturnCode("参数错误", _C_PARAMETER_ERROR);
 

@@ -1,11 +1,24 @@
 package net.pocrd.define;
 
-import net.pocrd.define.ServiceInjectable;
-
 /**
  * 用于处理半角逗号分隔的长整型数字字符串
  */
-public abstract class LongArrayStringInjector implements ServiceInjectable {
+public final class LongArrayStringInjector implements ServiceInjectable {
+    public LongArrayStringInjector() {
+    }
+
+    private String name;
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
     @Override
     public InjectionData parseDataFromHttpParam(String param) {
         Data data = new Data(getName());
@@ -14,7 +27,7 @@ public abstract class LongArrayStringInjector implements ServiceInjectable {
     }
 
     @Override
-    public Class<Data> getDataType() {
+    public Class<? extends InjectionData> getDataType() {
         return Data.class;
     }
 
@@ -51,7 +64,7 @@ public abstract class LongArrayStringInjector implements ServiceInjectable {
             sb.append(",").append(injection.getValue());
         }
 
-        public void merge(long n) {
+        public void append(long n) {
             if (sb == null) {
                 if (value == null) {
                     sb = new StringBuilder();

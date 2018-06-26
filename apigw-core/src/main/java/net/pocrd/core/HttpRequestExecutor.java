@@ -440,11 +440,7 @@ public class HttpRequestExecutor {
             if (method.subSystemId > 0 && method.subSystemId != callerSubSystemId && call.dependsAuthCall == null) {
                 return ApiReturnCode.SUBSYSTEM_MISMATCH;
             }
-            if (length == 1) {
-                call.businessId = request.getParameter(CommonParameter.businessId);
-            } else {
-                call.businessId = request.getParameter(m + "_" + CommonParameter.businessId);
-            }
+            call.businessId = request.getParameter(CommonParameter.businessId);
             // 解析业务参数使其对应各自业务api
             String[] parameters = new String[method.parameterInfos.length];
             apiContext.requiredSecurity = method.securityLevel.authorize(apiContext.requiredSecurity);

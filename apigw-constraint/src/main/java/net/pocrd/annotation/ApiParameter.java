@@ -51,7 +51,9 @@ public @interface ApiParameter {
      * 注入的参数名即为serviceInject的值
      * 注入的参数值格式为半角逗号
      */
-    Class<? extends ServiceInjectable> serviceInject() default ServiceInjectable.class;
+    String serviceInjectName() default "";
+
+    Class<? extends ServiceInjectable.InjectionData> serviceInjectDataType() default ServiceInjectable.InjectionData.class;
 
     /**
      * 枚举类型定义, 用于描述当前字符串的取值范围而又不引入接口二进制兼容问题

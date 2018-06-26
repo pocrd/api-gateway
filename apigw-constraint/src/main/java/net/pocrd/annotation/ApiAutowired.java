@@ -20,5 +20,7 @@ public @interface ApiAutowired {
      * 不为默认值时表明该参数接受服务端注入
      * 注入的参数名即为serviceInject的值
      */
-    Class<? extends ServiceInjectable> serviceInject() default ServiceInjectable.class;
+    Class<? extends ServiceInjectable.InjectionData> serviceInjectDataType() default ServiceInjectable.InjectionData.class;
+
+    String serviceInjectName();
 }

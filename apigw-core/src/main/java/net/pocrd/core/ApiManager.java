@@ -456,8 +456,20 @@ public final class ApiManager {
                                 pInfo.isRsaEncrypted = p.rsaEncrypted();
                                 pInfo.ignoreForSecurity = p.ignoreForSecurity();
                                 pInfo.name = p.name();
-                                pInfo.injectable = (p.serviceInject() == null || p.serviceInject() == ServiceInjectable.class) ?
-                                        null : p.serviceInject().newInstance();
+                                if (p.serviceInjectName() != null && p.serviceInjectName().length() > 0
+                                        && p.serviceInjectDataType() != ServiceInjectable.InjectionData.class) {
+                                    Class injectClass = p.serviceInjectDataType().getEnclosingClass();
+                                    if (injectClass == null) {
+                                        throw new RuntimeException("Injection Data " + p.serviceInjectDataType().getName()
+                                                + " should be defined as a member class, in api " + api.name() + "  " + pInfo.name);
+                                    }
+                                    if (!Modifier.isStatic(p.serviceInjectDataType().getModifiers())) {
+                                        throw new RuntimeException("Injection Data " + p.serviceInjectDataType().getName()
+                                                + " should be defined as a static class, in api " + api.name() + "  " + pInfo.name);
+                                    }
+                                    pInfo.injectable = (ServiceInjectable)injectClass.newInstance();
+                                    pInfo.injectable.setName(p.serviceInjectName());
+                                }
                                 pInfo.isRequired = pInfo.injectable == null ? p.required() : false;
                                 if (p.enumDef() != null && p.enumDef() != EnumNull.class) {
                                     if (pInfo.type == String.class || pInfo.type.getComponentType() == String.class
@@ -521,8 +533,20 @@ public final class ApiManager {
                                 pInfo.name = p.value().name();
                                 pInfo.isRequired = false;
                                 if (p.value() == AutowireableParameter.serviceInjection) {
-                                    pInfo.injectable = (p.serviceInject() == null || p.serviceInject() == ServiceInjectable.class) ?
-                                            null : p.serviceInject().newInstance();
+                                    if (p.serviceInjectName() != null && p.serviceInjectName().length() > 0
+                                            && p.serviceInjectDataType() != ServiceInjectable.InjectionData.class) {
+                                        Class injectClass = p.serviceInjectDataType().getEnclosingClass();
+                                        if (injectClass == null) {
+                                            throw new RuntimeException("InjectDataType " + p.serviceInjectDataType().getName()
+                                                    + " should be defined as a member class, in api " + api.name() + "  " + pInfo.name);
+                                        }
+                                        if (!Modifier.isStatic(p.serviceInjectDataType().getModifiers())) {
+                                            throw new RuntimeException("InjectDataType " + p.serviceInjectDataType().getName()
+                                                    + " should be defined as a static class, in api " + api.name() + "  " + pInfo.name);
+                                        }
+                                        pInfo.injectable = (ServiceInjectable)injectClass.newInstance();
+                                        pInfo.injectable.setName(p.serviceInjectName());
+                                    }
                                 }
                                 if (AutowireableParameter.postBody.name().equals(pInfo.name) && parameterTypes.length != 1) {
                                     throw new RuntimeException(
